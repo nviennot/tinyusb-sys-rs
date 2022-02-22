@@ -17,7 +17,6 @@ fn add_all_c_files_in_dir(build: &mut Build, path: impl AsRef<Path>) {
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("Missing OUT_DIR"));
 
-    // Create tusb_config.h
     {
         let mut f = File::create(out_dir.join("tusb_config.h"))
             .expect("Failed to create tusb_config.h");
@@ -38,12 +37,11 @@ fn main() {
         ).unwrap();
     let sysroot = sysroot.trim();
 
-    let mut b = Build::new();
-    add_all_c_files_in_dir(&mut b, "tinyusb/src");
-    b
+    let mut build = Build::new();
+    add_all_c_files_in_dir(&mut build, "tinyusb/src");
+    build
         .include("tinyusb/src")
         .include(&out_dir) // for the tusb_config.h file
-        //.archiver("arm-none-eabi-ar") // To avoid "has no symbols" warnings
         .compile("tinyusb");
 
     let target = env::var("TARGET").expect("Missing TARGET env var");
