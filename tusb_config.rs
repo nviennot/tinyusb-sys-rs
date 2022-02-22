@@ -3,6 +3,9 @@
 pub fn generate_cfg() -> String {
     let mut cfg = String::new();
 
+    cfg.push_str("#ifndef _TUSB_CONFIG_H_\n");
+    cfg.push_str("#define _TUSB_CONFIG_H_\n");
+
     #[cfg(feature = "host")]
     cfg.push_str("#define CFG_TUSB_RHPORT0_MODE OPT_MODE_HOST\n");
     #[cfg(feature = "device")]
@@ -181,6 +184,8 @@ cfg.push_str("#define CFG_TUD_BTH 1\n");
 cfg.push_str("#define CFG_TUD_ECM_RNDIS 1\n");
 #[cfg(all(feature = "device", feature = "ncm"))]
 cfg.push_str("#define CFG_TUD_NCM 1\n");
+
+    cfg.push_str("#endif\n");
 
     cfg
 }

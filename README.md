@@ -11,12 +11,12 @@ handled in the non-ISR task function.
 
 This crate provides Rust bindings for the library.
 
-Declare the dependency as such, for example to host a mass storage class device
+Declare the dependency as such, for example to operate as a mass storage device
 on an MCU from the STM32F1 family:
 
 ```
 [dependencies]
-tinyusb-sys = { version = "0.1", features = ["host", "msc", "stm32f1"] }
+tinyusb-sys = { version = "0.1", features = ["device", "msc", "stm32f1"] }
 ```
 
 ## Feature definitions

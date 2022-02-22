@@ -88,6 +88,9 @@ elif cmd == "tusb_config.rs":
 pub fn generate_cfg() -> String {{
     let mut cfg = String::new();
 
+    cfg.push_str("#ifndef _TUSB_CONFIG_H_\\n");
+    cfg.push_str("#define _TUSB_CONFIG_H_\\n");
+
     #[cfg(feature = "host")]
     cfg.push_str("#define CFG_TUSB_RHPORT0_MODE OPT_MODE_HOST\\n");
     #[cfg(feature = "device")]
@@ -97,6 +100,8 @@ pub fn generate_cfg() -> String {{
     cfg.push_str("#define CFG_TUSB_MEM_SECTION        __attribute__((section(\\\".data.usb\\\")))\\n");
 
     {cfg}
+
+    cfg.push_str("#endif\\n");
 
     cfg
 }}
