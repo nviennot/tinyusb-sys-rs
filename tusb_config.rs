@@ -14,6 +14,8 @@ pub fn generate_cfg() -> String {
     cfg.push_str("#define CFG_TUSB_OS                 OPT_OS_NONE\n");
     cfg.push_str("#define CFG_TUSB_MEM_SECTION        __attribute__((section(\".data.usb\")))\n");
 
+    cfg.push_str("#define CFG_TUD_MSC_EP_BUFSIZE 512\n");
+
     #[cfg(all(feature = "host", feature = "device"))]
 compile_error!("choose only host or device");
 #[cfg(not(any(feature = "host", feature ="device")))]

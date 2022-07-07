@@ -24,23 +24,30 @@ fn main() {
             .expect("Failed to write to tusb_config.h");
     }
 
-    let sysroot = String::from_utf8(
+    let include_paths = String::from_utf8(
         Build::new()
             .get_compiler().to_command()
-            .arg("-print-sysroot")
-            .stdout(std::process::Stdio::piped())
+            .arg("-E").arg("-Wp,-v").arg("-xc").arg("/dev/null")
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::piped())
             .spawn()
-            .expect("Failed to run the compiler")
+            .expect("Failed to run the compiler to get paths")
             .wait_with_output()
-            .expect("cc -print-sysroot failed")
-            .stdout
-        ).unwrap();
-    let sysroot = sysroot.trim();
+            .expect("Failed to run the compiler to get paths")
+            .stderr
+        ).unwrap()
+    .lines()
+        .filter_map(|line| line.strip_prefix(" "))
+        .map(|path| format!("-I{}", path))
+        .collect::<Vec<_>>();
+
+    eprintln!("include_paths={:?}", include_paths);
 
     let mut build = Build::new();
     add_all_c_files_in_dir(&mut build, "tinyusb/src");
     build
         .include("tinyusb/src")
+        .include("tinyusb/hw/mcu/st/cmsis_device_f1/Include")
         .include(&out_dir) // for the tusb_config.h file
         .compile("tinyusb");
 
@@ -55,14 +62,13 @@ fn main() {
         .use_core()
         .rustfmt_bindings(true)
         .ctypes_prefix("cty")
-        .blocklist_file(&format!("{}/include/.*", &sysroot))
         .clang_args(&vec![
             "-target", &target,
             "-fvisibility=default",
             "-fshort-enums",
         ])
         .clang_arg("-Itinyusb/src")
-        .clang_arg(&format!("-I{}/include", &sysroot))
+        .clang_args(&include_paths)
         .generate()
         .expect("Unable to generate bindings");
 
